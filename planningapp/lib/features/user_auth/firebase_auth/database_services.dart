@@ -32,6 +32,16 @@ class DatabaseService {
     await _dbRef.child('users/$userId/tasks/$taskId/deadlines').push().set(deadlineData);
   }
 
+  Future<void> updateTask(String taskId, Map<String, dynamic> updatedTask) async {
+    if (userId == null) return; // Ensure user is logged in
+    await _dbRef.child('users/$userId/tasks/$taskId').set(updatedTask);
+  }
+
+// Delete a task
+  Future<void> deleteTask(String taskId) async {
+    if (userId == null) return; // Ensure user is logged in
+    await _dbRef.child('users/$userId/tasks/$taskId').remove();
+  }
   // Fetch deadlines for a specific task
   Stream<List<Map<String, dynamic>>> getDeadlines(String taskId) {
     if (userId == null) return Stream.value([]);
