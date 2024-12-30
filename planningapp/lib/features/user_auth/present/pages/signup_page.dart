@@ -1,7 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:planningapp/features/user_auth/firebase_auth/firebase_auth.dart';
-import 'package:planningapp/features/user_auth/present/pages/login_page.dart';
+import 'package:planningapp/features/user_auth/present/pages/calendar_page.dart';
 import 'package:planningapp/features/user_auth/present/widget/contain_form.dart';
 
 class SignupPage extends StatefulWidget {
@@ -12,11 +12,9 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
-  final FirebaseAuthService _auth = FirebaseAuthService();
-
-  TextEditingController _usernameController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   void dispose() {
@@ -26,11 +24,56 @@ class _SignupPageState extends State<SignupPage> {
     super.dispose();
   }
 
+  void _signUp() async {
+    String username = _usernameController.text.trim();
+    String email = _emailController.text.trim();
+    String password = _passwordController.text;
+
+    if (username.isEmpty || email.isEmpty || password.isEmpty) {
+      _showErrorSnackbar("All fields are required!");
+      return;
+    }
+
+    try {
+      // Firebase Authentication sign up
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Save additional user details in Firestore
+      await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
+        'username': username,
+        'email': email,
+      });
+
+      _showSuccessSnackbar("Account created successfully!");
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => CalendarPage()),
+      );
+    } catch (e) {
+      _showErrorSnackbar("Error occurred during sign-up: $e");
+    }
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message, style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
+    );
+  }
+
+  void _showSuccessSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message, style: TextStyle(color: Colors.white)), backgroundColor: Colors.green),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Signup"),
+        title: const Text("Sign Up"),
       ),
       body: Center(
         child: Padding(
@@ -38,26 +81,29 @@ class _SignupPageState extends State<SignupPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("Signup", style: TextStyle(fontSize: 29, fontWeight: FontWeight.bold)),
-              SizedBox(height: 20),
+              const Text(
+                "Sign Up",
+                style: TextStyle(fontSize: 29, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
               FormContainer(
                 controller: _usernameController,
                 hintText: "Username",
                 isPasswordField: false,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               FormContainer(
                 controller: _emailController,
                 hintText: "Email",
                 isPasswordField: false,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               FormContainer(
                 controller: _passwordController,
                 hintText: "Password",
                 isPasswordField: true,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               GestureDetector(
                 onTap: _signUp,
                 child: Container(
@@ -67,29 +113,27 @@ class _SignupPageState extends State<SignupPage> {
                     color: Colors.orange,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Center(
+                  child: const Center(
                     child: Text(
-                      "Signup",
+                      "Sign Up",
                       style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Already have an account?"),
-                  SizedBox(width: 5),
+                  const Text("Already have an account?"),
+                  const SizedBox(width: 5),
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (context) => LoginPage()),
-                        (route) => false,
-                      );
+                      Navigator.pop(context);
                     },
-                    child: Text("Login",style: TextStyle(color: Colors.cyan, fontWeight: FontWeight.bold),
+                    child: const Text(
+                      "Login",
+                      style: TextStyle(color: Colors.cyan, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
@@ -100,30 +144,4 @@ class _SignupPageState extends State<SignupPage> {
       ),
     );
   }
-
-  void _signUp() async {
-  String username = _usernameController.text;
-  String email = _emailController.text;
-  String password = _passwordController.text;
-
-  if (username.isEmpty || email.isEmpty || password.isEmpty) {
-    print("Please fill all fields.");
-    return; 
-  }
-
-  try {
-    User? user = await _auth.signUpWithEmailAndPassword(email, password);
-
-    if (user != null) {
-      print("User created successfully");
-
-      Navigator.pushReplacementNamed(context, "/home");  
-    } else {
-      print("Error occurred during sign up");
-    }
-  } catch (e) {
-    print("Error: $e");
-  }
-}
-
 }
