@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CalendarPage extends StatefulWidget {
   @override
@@ -9,22 +9,46 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
-  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  Map<DateTime, List<Map<String, dynamic>>> _events = {};
   final Random _random = Random();
 
+  CollectionReference eventsCollection =
+      FirebaseFirestore.instance.collection('events');
 
+  @override
+  void initState() {
+    super.initState();
+  }
 
-  Color _generateRandomColor() {
+  Color _generatePastelColor() {
+    const int factor = 150;
     return Color.fromARGB(
       255,
-      _random.nextInt(256),
-      _random.nextInt(256),
-      _random.nextInt(256),
+      factor + _random.nextInt(106),
+      factor + _random.nextInt(106),
+      factor + _random.nextInt(106),
     );
+  }
+
+  Future<void> _addEvent(String title, String description, Color color) async {
+    await eventsCollection.add({
+      'title': title,
+      'description': description,
+      'color': color.value,
+      'date': _selectedDay ?? _focusedDay,
+    });
+  }
+
+  Future<void> _editEvent(String id, String title, String description) async {
+    await eventsCollection.doc(id).update({
+      'title': title,
+      'description': description,
+    });
+  }
+
+  Future<void> _deleteEvent(String id) async {
+    await eventsCollection.doc(id).delete();
   }
 
   @override
@@ -32,12 +56,7 @@ class _CalendarPageState extends State<CalendarPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Enhanced Calendar'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: _showSearchDialog,
-          ),
-        ],
+  
       ),
       body: Column(
         children: [
@@ -53,9 +72,9 @@ class _CalendarPageState extends State<CalendarPage> {
                 _focusedDay = focusedDay;
               });
             },
-            eventLoader: (day) => _events[day] ?? [],
             calendarStyle: CalendarStyle(
               markerDecoration: BoxDecoration(
+                color: Colors.blueAccent,
                 shape: BoxShape.circle,
               ),
             ),
@@ -75,30 +94,44 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   Widget _buildEventList() {
-    final events = _events[_selectedDay] ?? [];
-    return events.isEmpty
-        ? Center(child: Text('No events for this day.'))
-        : ListView.builder(
-            itemCount: events.length,
-            itemBuilder: (context, index) {
-              return Card(
-                color: events[index]['color'],
-                child: ListTile(
-                  title: Text(events[index]['title']),
-                  subtitle: Text(events[index]['description']),
-                  trailing: IconButton(
-                    icon: Icon(Icons.notifications),
-                    onPressed: () {
-                      _scheduleNotification(
-                        events[index]['title'],
-                        _selectedDay!.add(Duration(minutes: 1)),
-                      );
-                    },
-                  ),
-                ),
+    return StreamBuilder<QuerySnapshot>(
+      stream: eventsCollection
+          .where('date', isEqualTo: _selectedDay ?? _focusedDay)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+        final events = snapshot.data!.docs;
+        return events.isEmpty
+            ? Center(child: Text('No events for this day.'))
+            : ListView.builder(
+                itemCount: events.length,
+                itemBuilder: (context, index) {
+                  final event = events[index];
+                  final eventColor = Color(event['color']);
+                  return Card(
+                    color: eventColor,
+                    child: ListTile(
+                      title: Text(event['title']),
+                      subtitle: Text(event['description']),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: () => _showEditEventDialog(event.id, event['title'], event['description']),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () => _deleteEvent(event.id),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               );
-            },
-          );
+      },
+    );
   }
 
   void _showAddEventDialog() {
@@ -129,19 +162,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 final title = titleController.text;
                 final description = descriptionController.text;
                 if (title.isNotEmpty) {
-                  setState(() {
-                    final eventColor = _generateRandomColor();
-                    final event = {
-                      'title': title,
-                      'description': description,
-                      'color': eventColor,
-                    };
-                    if (_events[_selectedDay ?? _focusedDay] == null) {
-                      _events[_selectedDay ?? _focusedDay] = [event];
-                    } else {
-                      _events[_selectedDay ?? _focusedDay]!.add(event);
-                    }
-                  });
+                  _addEvent(title, description, _generatePastelColor());
                   Navigator.pop(context);
                 }
               },
@@ -157,32 +178,39 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
-  void _showSearchDialog() {
-    final searchController = TextEditingController();
+  void _showEditEventDialog(String id, String title, String description) {
+    final titleController = TextEditingController(text: title);
+    final descriptionController = TextEditingController(text: description);
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Search Events'),
-          content: TextField(
-            controller: searchController,
-            decoration: InputDecoration(labelText: 'Event Title'),
+          title: Text('Edit Event'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleController,
+                decoration: InputDecoration(labelText: 'Event Title'),
+              ),
+              TextField(
+                controller: descriptionController,
+                decoration: InputDecoration(labelText: 'Description'),
+              ),
+            ],
           ),
           actions: [
             TextButton(
               onPressed: () {
-                final query = searchController.text.toLowerCase();
-                final results = _events.values.expand((events) {
-                  return events.where(
-                    (event) => event['title'].toLowerCase().contains(query),
-                  );
-                }).toList();
-
-                Navigator.pop(context);
-                _showSearchResults(results);
+                final newTitle = titleController.text;
+                final newDescription = descriptionController.text;
+                if (newTitle.isNotEmpty) {
+                  _editEvent(id, newTitle, newDescription);
+                  Navigator.pop(context);
+                }
               },
-              child: Text('Search'),
+              child: Text('Save'),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -194,34 +222,3 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
-  void _showSearchResults(List<Map<String, dynamic>> results) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Search Results'),
-          content: results.isEmpty
-              ? Text('No events found.')
-              : SizedBox(
-                  height: 300,
-                  child: ListView.builder(
-                    itemCount: results.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(results[index]['title']),
-                        subtitle: Text(results[index]['description']),
-                      );
-                    },
-                  ),
-                ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('Close'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
