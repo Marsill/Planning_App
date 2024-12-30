@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:planningapp/features/app/splash_screen/splash_screen.dart';
+import 'package:planningapp/features/user_auth/present/pages/home_page.dart';
 import 'package:planningapp/features/user_auth/present/pages/login_page.dart';
 
 Future main() async{
@@ -23,10 +23,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Planning',
-      home: SplashScreen(
-        child: LoginPage(),
-      )
+      title: 'Planning App',
+      initialRoute: '/login',
+      routes: {
+        '/login': (context) => LoginPage(),
+        '/home': (context) => HomePage(),
+      },
     );
-  } 
+  }
 }

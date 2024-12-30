@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:planningapp/features/user_auth/present/pages/calendar_page.dart';
 import 'package:planningapp/features/user_auth/present/pages/task.dart';
 
 class HomePage extends StatelessWidget {
@@ -57,7 +58,7 @@ class HomePage extends StatelessWidget {
                     icon: Icons.calendar_today,
                     title: "Calendar/Reminders",
                     onTap: () {
-                      // Navigate to Calendar/Reminders Page
+                      Navigator.push( context, MaterialPageRoute(builder: (context) => CalendarPage()), );
                     },
                   ),
                 ],

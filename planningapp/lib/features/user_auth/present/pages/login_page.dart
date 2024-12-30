@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:planningapp/features/user_auth/present/pages/calendar_page.dart';
+import 'package:planningapp/features/user_auth/present/pages/home_page.dart';
 import 'package:planningapp/features/user_auth/present/pages/signup_page.dart';
 import 'package:planningapp/features/user_auth/present/widget/contain_form.dart';
 
@@ -38,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
       if (userCredential.user != null) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => CalendarPage()),
+          MaterialPageRoute(builder: (context) => HomePage()),
         );
       }
     } catch (e) {
