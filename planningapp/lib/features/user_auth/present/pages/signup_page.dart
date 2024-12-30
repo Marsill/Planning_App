@@ -62,7 +62,7 @@ class SignupPage extends StatelessWidget {
                     width: 5,),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage()));
+                        Navigator.pushAndRemoveUntil( context, MaterialPageRoute(builder: (context) => LoginPage()), (Route<dynamic> route) => false, );
                       },
                       child: Text("Login", style: TextStyle(color: Colors.cyan, fontWeight: FontWeight.bold),),
                     )
