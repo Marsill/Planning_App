@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "743602907086",
+    "project_id": "planning-5aa36",
+    "storage_bucket": "planning-5aa36.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:743602907086:android:340c7588a7cf8d30f02d9f",
+        "android_client_info": {
+          "package_name": "com.flutter.planningapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUozWUe8z814C6x8e-Ew2wxAU5J2SsyE4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
