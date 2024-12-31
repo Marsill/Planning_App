@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:planningapp/features/user_auth/present/pages/calendar_page.dart';
+import 'package:planningapp/features/user_auth/present/pages/notes_page.dart';
 import 'package:planningapp/features/user_auth/present/pages/profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:planningapp/features/user_auth/present/pages/task.dart';
@@ -56,7 +57,7 @@ class HomePage extends StatelessWidget {
                     icon: Icons.note,
                     title: "Notes",
                     onTap: () {
-                      // Navigate to Notes Page
+                      Navigator.push( context, MaterialPageRoute(builder: (context) => NotesPage()), );
                     },
                   ),
                   SizedBox(height: 20),

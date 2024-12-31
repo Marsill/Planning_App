@@ -57,7 +57,7 @@ class FirestoreService {
 class TaskPage extends StatelessWidget {
   final FirestoreService _firestoreService = FirestoreService();
 
-  TaskPage({Key? key}) : super(key: key);
+  TaskPage({super.key});
 
   @override
   Widget build(BuildContext context) {
