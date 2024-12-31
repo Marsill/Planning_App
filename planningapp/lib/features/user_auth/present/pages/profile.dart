@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:planningapp/features/user_auth/present/pages/login_page.dart';
-import 'home_page.dart';
+import 'package:planningapp/features/user_auth/present/widget/custom_sidebar.dart';
+
 
 class ProfilePage extends StatefulWidget {
   final String email;
@@ -137,48 +138,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Profile Page"),
-      ),
-      drawer: Drawer(
-        backgroundColor: Colors.grey[300],
-        child: ListView(
-          children: [
-            const DrawerHeader(
-              child: Center(
-                child: Icon(
-                  Icons.menu,
-                  size: 64,
-                ),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text("Home"),
-              onTap: () {
-                Navigator.pop(context); // Close the drawer
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HomePage()),
-                );
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text("Logout"),
-              onTap: () async {
-                await FirebaseAuth.instance.signOut();
-                 Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+    return CustomSidebar(
+      title: 'Profile Page',
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -279,6 +240,12 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 20),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          print("FAB clicked!");
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }

@@ -3,8 +3,14 @@ import 'package:flutter/material.dart';
 class CustomSidebar extends StatelessWidget {
   final String title;
   final Widget body;
+  final Widget? floatingActionButton; // Add this optional parameter
 
-  const CustomSidebar({super.key, required this.title, required this.body});
+  const CustomSidebar({
+    super.key,
+    required this.title,
+    required this.body,
+    this.floatingActionButton, // Optional
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +45,13 @@ class CustomSidebar extends StatelessWidget {
               ),
             ),
             ListTile(
+              leading: Icon(Icons.person),
+              title: Text('Profile'),
+              onTap: () {
+                Navigator.pushNamed(context, '/profile_page');
+              },
+            ),
+            ListTile(
               leading: Icon(Icons.task),
               title: Text('Tasks'),
               onTap: () {
@@ -49,14 +62,14 @@ class CustomSidebar extends StatelessWidget {
               leading: Icon(Icons.calendar_today),
               title: Text('Calendar'),
               onTap: () {
-                Navigator.pushReplacementNamed(context, '/calendar');
+                Navigator.pushReplacementNamed(context, '/calendar_page');
               },
             ),
             ListTile(
               leading: Icon(Icons.note),
               title: Text('Notes'),
               onTap: () {
-                Navigator.pushReplacementNamed(context, '/notes');
+                Navigator.pushReplacementNamed(context, '/notes_page');
               },
             ),
             Divider(),
@@ -74,6 +87,7 @@ class CustomSidebar extends StatelessWidget {
         ),
       ),
       body: body,
+      floatingActionButton: floatingActionButton, // Use the optional parameter
     );
   }
 }

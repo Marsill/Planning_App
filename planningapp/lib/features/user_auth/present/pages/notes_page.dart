@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:planningapp/features/user_auth/present/widget/custom_sidebar.dart';
 import 'add_edit_note_page.dart';
 
 class NotesPage extends StatelessWidget {
@@ -9,12 +10,8 @@ class NotesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('My Notes'),
-        centerTitle: true,
-        backgroundColor: Colors.blue,
-      ),
+    return CustomSidebar(
+      title: 'My Notes',
       body: StreamBuilder<QuerySnapshot>(
         stream: notesRef.where('uid', isEqualTo: user?.uid).snapshots(),
         builder: (context, snapshot) {
@@ -67,3 +64,4 @@ class NotesPage extends StatelessWidget {
     );
   }
 }
+

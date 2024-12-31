@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:planningapp/features/user_auth/present/widget/custom_sidebar.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+
 
 class CalendarPage extends StatefulWidget {
   @override
@@ -72,16 +74,8 @@ class _CalendarPageState extends State<CalendarPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Calendar'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: _showSearchDialog,
-          ),
-        ],
-      ),
+    return CustomSidebar(
+      title: 'Calendar',
       body: Column(
         children: [
           TableCalendar(

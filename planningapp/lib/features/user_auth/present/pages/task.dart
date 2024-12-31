@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:planningapp/features/user_auth/present/widget/custom_sidebar.dart';
+
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -61,12 +63,8 @@ class TaskPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Task Manager'),
-        backgroundColor: Colors.blue,
-        elevation: 0,
-      ),
+    return CustomSidebar(
+      title: 'Task Manager',
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: _firestoreService.getTasks(),
         builder: (context, snapshot) {
@@ -170,6 +168,9 @@ class TaskPage extends StatelessWidget {
       ),
     );
   }
+
+ 
+
 
   Future<void> _addTask(BuildContext context) async {
     final TextEditingController titleController = TextEditingController();
@@ -301,7 +302,6 @@ class TaskPage extends StatelessWidget {
       },
     );
   }
-
   Future<void> _toggleCompletion(Map<String, dynamic> task) async {
     final updatedTask = {
       ...task,
