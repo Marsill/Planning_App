@@ -133,7 +133,7 @@ class _SignupPageState extends State<SignupPage> {
                     },
                     child: const Text(
                       "Login",
-                      style: TextStyle(color: Colors.cyan, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],

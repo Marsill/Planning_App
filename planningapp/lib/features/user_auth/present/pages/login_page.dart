@@ -61,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Login"),
-        backgroundColor: Colors.cyan,
+        backgroundColor: Colors.blue,
       ),
       body: Center(
         child: Padding(
@@ -96,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
                     width: double.infinity,
                     height: 50,
                     decoration: BoxDecoration(
-                      color: Colors.cyan,
+                      color: Colors.blue,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Center(
@@ -128,7 +128,7 @@ class _LoginPageState extends State<LoginPage> {
                       child: const Text(
                         "Sign Up",
                         style: TextStyle(
-                          color: Colors.cyan,
+                          color: Colors.blue,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
