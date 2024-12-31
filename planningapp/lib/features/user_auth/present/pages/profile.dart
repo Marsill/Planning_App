@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:planningapp/features/user_auth/present/pages/login_page.dart';
 import 'home_page.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -169,8 +170,10 @@ class _ProfilePageState extends State<ProfilePage> {
               title: const Text("Logout"),
               onTap: () async {
                 await FirebaseAuth.instance.signOut();
-                Navigator.popUntil(context, (route) => route.isFirst);
-                print("User Logged Out");
+                 Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
               },
             ),
           ],

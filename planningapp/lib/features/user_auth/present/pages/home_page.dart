@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:planningapp/features/user_auth/present/pages/calendar_page.dart';
+import 'package:planningapp/features/user_auth/present/pages/profile.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:planningapp/features/user_auth/present/pages/task.dart';
 
 class HomePage extends StatelessWidget {
@@ -7,6 +9,10 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final User? user = FirebaseAuth.instance.currentUser;
+
+    final String name = user?.displayName ?? "Unknown User";
+    final String email = user?.email ?? "No Email";
     return Scaffold(
       appBar: AppBar(
         title: Text("Home"),
@@ -15,8 +21,8 @@ class HomePage extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.account_circle),
             onPressed: () {
-              // Navigate to Profile Page
-            },
+                      Navigator.push( context, MaterialPageRoute(builder: (context) => ProfilePage(email: email, name: name)), );
+                    },
           ),
         ],
       ),
