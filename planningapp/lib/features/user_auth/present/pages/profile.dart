@@ -36,12 +36,11 @@ class _ProfilePageState extends State<ProfilePage> {
   // Function to load user data
   Future<void> _loadUserData() async {
     if (currentUser != null) {
-      final user = FirebaseAuth.instance.currentUser;
-      final uid = user?.uid;
+      final uid = currentUser?.uid;
 
       try {
         // Fetch data from Firebase Auth
-        await user?.reload();
+        await currentUser?.reload();
         final updatedUser = FirebaseAuth.instance.currentUser;
 
         // Fetch additional details from Firestore
@@ -54,6 +53,14 @@ class _ProfilePageState extends State<ProfilePage> {
             email = updatedUser?.email ?? "No Email";
             phoneNumber = data?['phoneNumber'] ?? "No Phone Number";
             address = data?['address'] ?? "No Address";
+          });
+        } else {
+          // If no data exists in Firestore, use Firebase Auth data
+          setState(() {
+            displayName = updatedUser?.displayName ?? "No Name";
+            email = updatedUser?.email ?? "No Email";
+            phoneNumber = "No Phone Number";
+            address = "No Address";
           });
         }
       } catch (e) {
@@ -108,10 +115,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
       // Update additional details in Firestore
       final uid = updatedUser?.uid;
-      await _firestore.collection("users").doc(uid).update({
+      await _firestore.collection("users").doc(uid).set({
         "phoneNumber": phoneNumber,
         "address": address,
-      });
+      }, SetOptions(merge: true));
 
       setState(() {
         displayName = updatedUser?.displayName ?? "No Name";
@@ -273,4 +280,3 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 }
-
