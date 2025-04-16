@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:planningapp/features/user_auth/present/widget/custom_sidebar.dart';
 import 'add_edit_note_page.dart';
 
 class NotesPage extends StatelessWidget {
   final User? user = FirebaseAuth.instance.currentUser; // Get current user
-  final CollectionReference notesRef = FirebaseFirestore.instance.collection('notes');
+ final CollectionReference notesRef = FirebaseFirestore.instance.collection('notes');
+
+NotesPage({super.key});
+
 
   @override
   Widget build(BuildContext context) {
-    return CustomSidebar(
-      title: 'My Notes',
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('My Notes'),
+        centerTitle: true,
+        backgroundColor: Colors.blue,
+      ),
       body: StreamBuilder<QuerySnapshot>(
         stream: notesRef.where('uid', isEqualTo: user?.uid).snapshots(),
         builder: (context, snapshot) {
@@ -64,4 +70,3 @@ class NotesPage extends StatelessWidget {
     );
   }
 }
-
