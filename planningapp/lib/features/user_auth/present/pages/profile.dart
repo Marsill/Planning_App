@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:planningapp/features/user_auth/present/pages/login_page.dart';
-import 'package:planningapp/features/user_auth/present/widget/custom_sidebar.dart';
-
+import 'package:planningapp/features/user_auth/present/task.dart';
+import 'home_page.dart';
+import 'calander.dart';  
+//import 'task.dart';  
 
 class ProfilePage extends StatefulWidget {
   final String email;
@@ -138,8 +139,75 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return CustomSidebar(
-      title: 'Profile Page',
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Profile Page"),
+      ),
+      drawer: Drawer(
+        backgroundColor: Colors.grey[300],
+        child: ListView(
+          children: [
+            const DrawerHeader(
+              child: Center(
+                child: Icon(
+                  Icons.menu,
+                  size: 64,
+                ),
+              ),
+            ),
+            // Navigation Items
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text("Home"),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomePage()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.calendar_today),
+              title: const Text("Calendar"),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CalendarPage(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.check_box),
+              title: const Text("Task"),
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TaskPage(),
+                  ),
+                );
+              },
+            ),
+            const Divider(),
+            // Logout Option
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text("Logout"),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.popUntil(context, (route) => route.isFirst);
+                print("User Logged Out");
+              },
+            ),
+          ],
+        ),
+      ),
+
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -147,7 +215,6 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 30),
             GestureDetector(
               onTap: () {
-                // Add functionality to update profile picture
                 print("Change Profile Picture");
               },
               child: CircleAvatar(
@@ -240,12 +307,6 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 20),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          print("FAB clicked!");
-        },
-        child: const Icon(Icons.add),
       ),
     );
   }
